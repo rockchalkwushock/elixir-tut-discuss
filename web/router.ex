@@ -7,6 +7,7 @@ defmodule Discuss.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug Discuss.Plugs.SetUser
   end
 
   pipeline :api do
@@ -35,6 +36,22 @@ defmodule Discuss.Router do
     # NOTE when using "resources" I no longer have control over wildcards
     # `phoenix` will assume that I mean :id === %{"id" => topic_id}
     resources "/", TopicController
+  end
+
+  # authentication scope
+  scope "/auth", Discuss do
+    pipe_through :browser
+
+    # request is defined by Ueberauth out of box
+    # Ueberauth is configured to look at ___ & params
+    # and determine which Strategy to use.
+    # So adding a Strategy is just adding the dep & config
+    # NOTE order of routes matter!!!
+    # putting /signout after /:provider leaves phoenix struggling
+    # error was about request/2 etc etc
+    get "/signout", AuthController, :signout
+    get "/:provider", AuthController, :request
+    get "/:provider/callback", AuthController, :callback
   end
 
   # Other scopes may use custom stacks.

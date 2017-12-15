@@ -33,11 +33,4 @@ config :logger, :console, format: "[$level] $message\n"
 # in production as building large stacktraces may be expensive.
 config :phoenix, :stacktrace_depth, 20
 
-# Configure your database
-config :discuss, Discuss.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "rockchalkwushock",
-  password: "",
-  database: "discuss_dev",
-  hostname: "localhost",
-  pool_size: 10
+import_config "dev.secret.exs"
