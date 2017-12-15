@@ -1,1 +1,15 @@
 /* This file is for your main application css. */
+
+/* All CSS here will be loaded to every page in the application */
+
+.help-block {
+  color: red;
+  position: absolute;
+  text-transform: uppercase;
+  top: 40px;
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 25px;
+}
