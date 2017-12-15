@@ -4,6 +4,7 @@ defmodule Discuss.Topic do
   # required
   schema "topics" do
     field :title, :string
+    belongs_to :user, Discuss.User
   end
 
   # model level validation
