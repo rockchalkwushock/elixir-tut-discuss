@@ -4,7 +4,6 @@
 // To use Phoenix channels, the first step is to import Socket
 // and connect at the socket path in "lib/my_app/endpoint.ex":
 import {Socket} from "phoenix"
-
 let socket = new Socket("/socket", {params: {token: window.userToken}})
 
 // When you connect, you'll often need to authenticate the client.
@@ -54,9 +53,36 @@ let socket = new Socket("/socket", {params: {token: window.userToken}})
 socket.connect()
 
 // Now that you are connected, you can join channels with a topic:
-let channel = socket.channel("topic:subtopic", {})
-channel.join()
-  .receive("ok", resp => { console.log("Joined successfully", resp) })
-  .receive("error", resp => { console.log("Unable to join", resp) })
+// let channel = socket.channel("comments:1", {})
+// channel.join()
+//   .receive("ok", resp => { console.log("Joined successfully", resp) })
+//   .receive("error", resp => { console.log("Unable to join", resp) })
 
-export default socket
+// export default socket
+
+const createSocket = topicId => {
+  let channel = socket.channel(`comments:${topicId}`, {})
+  channel.join()
+    .receive("ok", ({ comments }) => renderComments(comments))
+    .receive("error")
+
+  channel.on(`comments:${topicId}:new`, ({ comment }) => renderComment(comment))
+
+  document.querySelector('button').addEventListener('click', () => {
+    const content = document.querySelector('textarea').value
+    channel.push('comment:add', { content: content })
+  })
+}
+
+// Injects string into markup
+const template = ({content, user}) =>
+  `<li class="collection-item">${content}<div class="secondary-content">${user ? user.email : "Anonymous"}</div></li>`
+// Accepts [comments], destruct and send content<String> to template.
+const renderComments = arr =>
+  document.querySelector('.collection').innerHTML = arr.map(comment => template(comment)).join('')
+// Accepts {comment} & destructs obj to supply content<String> to template.
+const renderComment = comment =>
+  document.querySelector('.collection').innerHTML += template(comment)
+
+window.createSocket = createSocket
+
